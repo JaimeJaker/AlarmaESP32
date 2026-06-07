@@ -1,0 +1,12 @@
+.pio/
+build/
+libdeps/
+.pioenvs/
+*.pio
+.platformio/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+*.log
+.env
