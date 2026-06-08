@@ -19,8 +19,9 @@ WebServer server(80);
 TaskHandle_t weatherTaskHandle = NULL;
 
 // ── Variables Globales ───────────────────────────────
-const char* ssid       = "Mesa8";
-const char* password   = "123456789";
+// Credenciales removidas por seguridad. El WiFi se gestiona mediante el portal (WiFiManager).
+const char* ssid       = "";
+const char* password   = "";
 const char* mqttServer = "broker.emqx.io";
 const int   mqttPort   = 1883;
 
@@ -65,7 +66,6 @@ int mainMenuIndex = 0;
 int disenoTipoIndex = 0;
 int faceMenuIndex = 0;
 
-WiFiManager wifiManager;
 bool shouldSaveConfig = false;
 
 void saveConfigCallback() {
@@ -75,6 +75,19 @@ void saveConfigCallback() {
 
 void configModeCallback(WiFiManager *myWiFiManager) {
   notify("AP WiFi listo: ESP32_Alarma_V5");
+}
+
+// Tarea que lanza el portal de configuración en background (no bloquea setup())
+void portalTask(void *pvParameters) {
+  WiFiManager wm;
+  wm.setAPCallback(configModeCallback);
+  wm.setSaveConfigCallback(saveConfigCallback);
+  wm.setConfigPortalTimeout(0);
+  wm.setDebugOutput(false);
+  Serial.println("[WIFI] PortalTask: iniciando portal de configuración en background");
+  wm.startConfigPortal("ESP32_Alarma_V5");
+  Serial.println("[WIFI] PortalTask: portal finalizado");
+  vTaskDelete(NULL);
 }
 
 unsigned long cronoStart = 0;
@@ -175,28 +188,46 @@ void setup() {
   strip.begin(); strip.show(); strip.setBrightness(255);
   display.begin();
 
-  WiFi.disconnect(true, true);
+  WiFi.disconnect(true, false);
   WiFi.persistent(false);
   delay(100);
 
-  wifiManager.resetSettings();
-
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP("ESP32_Alarma_V5.1");
-  wifiManager.setAPCallback(configModeCallback);
-  wifiManager.setSaveConfigCallback(saveConfigCallback);
-  wifiManager.setConfigPortalTimeout(0);
-  wifiManager.setDebugOutput(false);
+  WiFi.softAP("ESP32_Alarma_V5");
 
-  notify("Intentando WiFi guardado...");
-  bool connected = wifiManager.autoConnect("ESP32_Alarma_V5.1");
-  if (connected) {
+  notify("Intentando conectar a WiFi guardado...");
+  WiFi.begin();
+  unsigned long wifiStart = millis();
+  while (millis() - wifiStart < 5000 && WiFi.status() != WL_CONNECTED) {
+    delay(100);
+  }
+  if (WiFi.status() == WL_CONNECTED) {
     String ssid = WiFi.SSID();
     notify("WiFi conectada:\n" + ssid);
     Serial.printf("[WIFI] Conectado a %s\n", ssid.c_str());
   } else {
-    notify("WiFi no conectada.\nUsa AP para configurar.");
-    Serial.println("[WIFI] No se pudo conectar con WiFi guardado");
+    notify("No se conectó WiFi guardada.\nPortal activo.");
+    Serial.println("[WIFI] No se conectó WiFi guardada");
+  }
+
+  WiFiManager wm;
+  wm.setAPCallback(configModeCallback);
+  wm.setSaveConfigCallback(saveConfigCallback);
+  wm.setConfigPortalTimeout(0);
+  wm.setDebugOutput(false);
+
+  // Lanzar el portal en una tarea separada para no bloquear el arranque
+  BaseType_t ok = xTaskCreate(portalTask, "PortalTask", 8192, NULL, 1, NULL);
+  if (ok != pdPASS) {
+    Serial.println("[WIFI] ERROR: no se pudo crear PortalTask");
+  } else {
+    notify("Portal WiFi abierto: ESP32_Alarma_V5");
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    String ssid = WiFi.SSID();
+    notify("WiFi conectada:\n" + ssid);
+    Serial.printf("[WIFI] Conectado a %s\n", ssid.c_str());
   }
   WiFi.setSleep(false);
 

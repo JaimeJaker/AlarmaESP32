@@ -90,13 +90,16 @@ This repository includes additional documentation for contributors:
 ### Clima
 
 - actualización de clima por API
-- estado meteorológico en pantalla
+- votación entre tres fuentes (Open-Meteo, OpenWeatherMap y Met.no) en cada sincronización
+- estado meteorológico en pantalla con icono y temperatura
 - refresco manual desde web o MQTT
+- actualización automática cada 10 minutos y cada solicitud manual
 
 ### Conectividad
 
 - WiFi con WiFiManager
-- punto de acceso de configuración
+- punto de acceso de configuración siempre disponible en el arranque (`ESP32_Alarma_V5`)
+- intenta conectar a la red guardada al iniciar
 - servidor web integrado en ESP32 (puerto 80)
 - MQTT con broker público por defecto
 - API web interna y páginas HTML embebidas
@@ -180,12 +183,14 @@ pio device monitor -b 115200
 
 ### Configuración WiFi inicial
 
-Al arrancar, el ESP32 crea un AP de configuración.
-Conéctate a él y configura tu red WiFi.
+Al arrancar, el ESP32 inicia siempre con el portal de configuración abierto en el AP `ESP32_Alarma_V5`.
+- Si hay una red WiFi guardada, el dispositivo intenta conectarse automáticamente.
+- Si no puede conectarse, el portal de configuración permanece activo para ingresar nueva red.
+- Conéctate a `ESP32_Alarma_V5` y abre `http://192.168.4.1`.
 
 ### Accede al panel web
 
-Abre `http://<IP-del-ESP32>` en tu navegador.
+Abre `http://<IP-del-ESP32>` en tu navegador, o `http://192.168.4.1` cuando estés conectado al AP de configuración.
 
 ### Control físico
 
@@ -311,13 +316,14 @@ AlarmaEsp32V5.1/
 - Las puntuaciones Top 5 se guardan por juego.
 - El panel web no está autenticado.
 - MQTT no usa TLS/autenticación por defecto.
+- El portal WiFi de configuración está disponible en cada arranque mediante el AP `ESP32_Alarma_V5`.
 - Las credenciales WiFi se muestran como ejemplo en el código.
 
 ## Solución de problemas
 
 | Problema | Solución |
 |----------|----------|
-| WiFi no conecta | Verifica las credenciales en el portal del ESP32 |
+| WiFi no conecta | Verifica las credenciales en el portal del ESP32 o conéctate a `ESP32_Alarma_V5` en `192.168.4.1` |
 | Pantalla en blanco | Revisa las conexiones SPI y la alimentación 3.3V |
 | Buzzer no suena | Comprueba el pin 25 y la polaridad del buzzer |
 | MQTT no conecta | Verifica broker, puerto y firewall |

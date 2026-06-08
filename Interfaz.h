@@ -188,10 +188,12 @@ void drawGlobalNotification(bool fullScreen) {
     }
 
     if (fullScreen) {
-      display.setTextSize(1);
-      display.setTextColor(COLOR_WHITE);
-      display.setCursor(120 - (32*6)/2, boxY + boxH + 10);
-      display.print("B1: Detener   B3: Posponer 5m");
+      if (alarmaActiva >= 0 || timerSonando) {
+        display.setTextSize(1);
+        display.setTextColor(COLOR_WHITE);
+        display.setCursor(120 - (32*6)/2, boxY + boxH + 10);
+        display.print("B1: Detener   B3: Posponer 5m");
+      }
     }
   }
 }

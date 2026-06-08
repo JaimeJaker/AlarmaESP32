@@ -381,14 +381,16 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     mqttClient.publish(topicStatus, "Mensaje mostrado en pantalla");
   }
   else if (String(topic) == topicWeather) {
-    // Trigger immediate fetch desde MQTT
-    triggerWeatherFetch();
-    // Esperamos brevemente para permitir que se actualice (no bloqueante pesado)
-    vTaskDelay(pdMS_TO_TICKS(500));
-    String statusMsg = "Clima: " + globalTemp + " " + globalWeather;
-    String displayMsg = globalTemp + "\n" + globalWeather;
-    mqttClient.publish(topicStatus, statusMsg.c_str());
-    notify(displayMsg, 3000);
+    if (WiFi.status() != WL_CONNECTED) {
+      mqttClient.publish(topicStatus, "WiFi no conectado");
+    } else {
+      updateWeather();
+      forceRedraw = true;
+      String statusMsg = "Clima: " + globalTemp + " " + globalWeather;
+      String displayMsg = globalTemp + "\n" + globalWeather;
+      mqttClient.publish(topicStatus, statusMsg.c_str());
+      notify(displayMsg, 3000);
+    }
   }
   else if (String(topic) == topicInfo) {
     String info = "IP:" + WiFi.localIP().toString() + " | RSSI:" + String(WiFi.RSSI()) + "dBm | Uptime:" + String(millis()/60000) + "m";

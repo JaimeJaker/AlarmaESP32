@@ -147,7 +147,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
                 <button onclick="cmd('/api/crono?action=START')">INICIAR CRONO</button>
                 <button onclick="cmd('/api/crono?action=PAUSE')">PAUSA</button>
                 <button class="btn-danger" onclick="cmd('/api/crono?action=RESET')">RESET</button>
-                <button onclick="cmd('/api/weather'); setTimeout(loadAlarms, 2000);">ACT. CLIMA</button>
+                <button onclick="cmdReload('/api/weather')">ACT. CLIMA</button>
             </div>
             <p id="weatherData" style="text-align:center; color:#00adb5; font-size:1.1em; font-weight:bold; margin-top:15px; margin-bottom:0;">Clima: --</p>
             <hr style="border:0.5px solid #444; margin:15px 0;">
