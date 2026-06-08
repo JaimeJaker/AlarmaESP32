@@ -234,12 +234,13 @@ void drawSeleccionJuego() {
 // Panel Web: QR + IP + URL (Ajustado para pantalla circular)
 void drawQR() {
   display.fillScreen(COLOR_BLACK);
-  String ip  = WiFi.localIP().toString();
-  String url = "http://" + ip;
+  String panelIp = WiFi.status() == WL_CONNECTED ? WiFi.localIP().toString() : WiFi.softAPIP().toString();
+  String panelUrl = "http://" + panelIp + ":81";
+  String portalUrl = "http://192.168.4.1";
   
   QRCode qrcode;
   uint8_t qrcodeData[qrcode_getBufferSize(2)];
-  qrcode_initText(&qrcode, qrcodeData, 2, 0, url.c_str()); // Version 2, ECC LOW (0)
+  qrcode_initText(&qrcode, qrcodeData, 2, 0, panelUrl.c_str()); // Version 2, ECC LOW (0)
   
   int sz = qrcode.size;
   if (sz > 0) {
@@ -247,7 +248,7 @@ void drawQR() {
     const int qrPx = sz * mod;
     const int qz = mod * 3;              // Zona blanca de 3 modulos
     const int qrX  = (240 - qrPx) / 2;
-    const int qrY  = 40;                 // Bajarlo un poco mas hacia el centro del circulo
+    const int qrY  = 30;                 // Bajarlo un poco mas hacia el centro
     
     // Fondo blanco grande que incluye el Quiet Zone
     display.fillRect(qrX - qz, qrY - qz, qrPx + 2*qz, qrPx + 2*qz, COLOR_WHITE);
@@ -257,17 +258,18 @@ void drawQR() {
         if (qrcode_getModule(&qrcode, x, y)) 
           display.fillRect(qrX+x*mod, qrY+y*mod, mod, mod, COLOR_BLACK);
           
-    int ty = qrY + qrPx + qz + 10;
-    display.setTextColor(COLOR_CYAN); display.setTextSize(2);
-    display.setCursor(120-(int)(ip.length()*12)/2, ty); display.print(ip);
-    display.setTextColor(COLOR_YELLOW); display.setTextSize(1);
-    display.setCursor(120-(int)(url.length()*6)/2, ty+22); display.print(url);
+    int ty = qrY + qrPx + qz + 2;
+    display.setTextColor(COLOR_CYAN); display.setTextSize(1);
+    display.setCursor(120-(int)(panelUrl.length()*6)/2, ty); display.print("Panel Web:");
+    display.setCursor(120-(int)(panelUrl.length()*6)/2, ty+12); display.print(panelUrl);
+    display.setTextColor(COLOR_YELLOW); display.setCursor(120-(int)(portalUrl.length()*6)/2, ty+26); display.print("Portal Wifi:");
+    display.setCursor(120-(int)(portalUrl.length()*6)/2, ty+38); display.print(portalUrl);
   } else {
     // Fallback texto si QR falla
     display.setTextColor(COLOR_CYAN); display.setTextSize(2);
-    display.setCursor(120-(int)(ip.length()*12)/2, 90); display.print(ip);
+    display.setCursor(120-(int)(panelIp.length()*12)/2, 90); display.print(panelIp);
     display.setTextColor(COLOR_YELLOW); display.setTextSize(1);
-    display.setCursor(120-(int)(url.length()*6)/2,125); display.print(url);
+    display.setCursor(120-(int)(panelUrl.length()*6)/2,125); display.print(panelUrl);
   }
 }
 

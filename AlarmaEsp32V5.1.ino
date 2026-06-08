@@ -15,7 +15,7 @@ Preferences preferences;
 Adafruit_GC9A01A display = Adafruit_GC9A01A(TFT_CS, TFT_DC, TFT_RST);
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
-WebServer server(80);
+WebServer server(81);
 TaskHandle_t weatherTaskHandle = NULL;
 
 // ── Variables Globales ───────────────────────────────
@@ -67,26 +67,29 @@ int disenoTipoIndex = 0;
 int faceMenuIndex = 0;
 
 bool shouldSaveConfig = false;
+volatile bool portalModeActive = false;
 
 void saveConfigCallback() {
   shouldSaveConfig = true;
-  notify("Guardando WiFi...");
+  Serial.println("[WIFI] Guardar configuración WiFi solicitado");
 }
 
 void configModeCallback(WiFiManager *myWiFiManager) {
-  notify("AP WiFi listo: ESP32_Alarma_V5");
+  portalModeActive = true;
+  Serial.println("[WIFI] Modo portal WiFi activado");
 }
 
 // Tarea que lanza el portal de configuración en background (no bloquea setup())
 void portalTask(void *pvParameters) {
-  WiFiManager wm;
-  wm.setAPCallback(configModeCallback);
-  wm.setSaveConfigCallback(saveConfigCallback);
-  wm.setConfigPortalTimeout(0);
-  wm.setDebugOutput(false);
+  WiFiManager *wm = new WiFiManager();
+  wm->setAPCallback(configModeCallback);
+  wm->setSaveConfigCallback(saveConfigCallback);
+  wm->setConfigPortalTimeout(0);
+  wm->setDebugOutput(false);
   Serial.println("[WIFI] PortalTask: iniciando portal de configuración en background");
-  wm.startConfigPortal("ESP32_Alarma_V5");
+  wm->startConfigPortal("ESP32_Alarma_V5");
   Serial.println("[WIFI] PortalTask: portal finalizado");
+  delete wm;
   vTaskDelete(NULL);
 }
 
