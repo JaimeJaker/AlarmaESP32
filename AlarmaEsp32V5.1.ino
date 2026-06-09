@@ -72,6 +72,7 @@ volatile bool portalModeActive = false;
 void saveConfigCallback() {
   shouldSaveConfig = true;
   Serial.println("[WIFI] Guardar configuración WiFi solicitado");
+<<<<<<< HEAD
   
   // Guardar las credenciales actuales en nuestro namespace
   String ssid = WiFi.SSID();
@@ -81,6 +82,8 @@ void saveConfigCallback() {
     Serial.printf("[WIFI] 💾 Guardando credenciales: SSID=%s\n", ssid.c_str());
     saveWiFiNetwork(ssid.c_str(), password.c_str());
   }
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
 }
 
 void configModeCallback(WiFiManager *myWiFiManager) {
@@ -88,6 +91,7 @@ void configModeCallback(WiFiManager *myWiFiManager) {
   Serial.println("[WIFI] Modo portal WiFi activado");
 }
 
+<<<<<<< HEAD
 // ── Función para resetear credenciales WiFi guardadas ────
 void resetWiFiCredentials() {
   Serial.println("[WIFI] 🔄 Limpiando credenciales WiFi guardadas...");
@@ -109,6 +113,8 @@ void resetWiFiCredentials() {
   }
 }
 
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
 // Tarea que lanza el portal de configuración en background (no bloquea setup())
 void portalTask(void *pvParameters) {
   WiFiManager *wm = new WiFiManager();
@@ -117,6 +123,7 @@ void portalTask(void *pvParameters) {
   wm->setConfigPortalTimeout(0);
   wm->setDebugOutput(false);
   Serial.println("[WIFI] PortalTask: iniciando portal de configuración en background");
+<<<<<<< HEAD
   
   bool connected = wm->startConfigPortal("ESP32_Alarma_V5");
   
@@ -133,6 +140,10 @@ void portalTask(void *pvParameters) {
     }
   }
   
+=======
+  wm->startConfigPortal("ESP32_Alarma_V5");
+  Serial.println("[WIFI] PortalTask: portal finalizado");
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
   delete wm;
   vTaskDelete(NULL);
 }
@@ -242,6 +253,7 @@ void setup() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP("ESP32_Alarma_V5");
 
+<<<<<<< HEAD
   notify("Escaneando redes WiFi...");
   
   // Intentar conectarse a una red guardada que esté disponible
@@ -252,6 +264,21 @@ void setup() {
   } else {
     notify("No encontradas redes guardadas.\nPortal activo.");
     Serial.println("[WIFI] No se conectó a red guardada - Abriendo portal");
+=======
+  notify("Intentando conectar a WiFi guardado...");
+  WiFi.begin();
+  unsigned long wifiStart = millis();
+  while (millis() - wifiStart < 5000 && WiFi.status() != WL_CONNECTED) {
+    delay(100);
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    String ssid = WiFi.SSID();
+    notify("WiFi conectada:\n" + ssid);
+    Serial.printf("[WIFI] Conectado a %s\n", ssid.c_str());
+  } else {
+    notify("No se conectó WiFi guardada.\nPortal activo.");
+    Serial.println("[WIFI] No se conectó WiFi guardada");
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
   }
 
   WiFiManager wm;
@@ -270,11 +297,16 @@ void setup() {
 
   if (WiFi.status() == WL_CONNECTED) {
     String ssid = WiFi.SSID();
+<<<<<<< HEAD
     String password = WiFi.psk();
     notify("WiFi conectada:\n" + ssid);
     Serial.printf("[WIFI] Conectado a %s\n", ssid.c_str());
     // Guardar esta red en la lista de redes conocidas
     saveWiFiNetwork(ssid.c_str(), password.c_str());
+=======
+    notify("WiFi conectada:\n" + ssid);
+    Serial.printf("[WIFI] Conectado a %s\n", ssid.c_str());
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
   }
   WiFi.setSleep(false);
 

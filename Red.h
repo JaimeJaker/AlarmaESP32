@@ -141,6 +141,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
             <button onclick="setFace()">Cambiar Esfera</button>
         </div>
 
+<<<<<<< HEAD
         <div class="card" style="border-left-color: #ff6b6b;">
             <h3>Red WiFi</h3>
             <p style="font-size:0.9em;color:#aaa;margin-bottom:10px;"><strong>Red actual:</strong> <span id="wifiName">Cargando...</span></p>
@@ -148,6 +149,8 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
             <p style="font-size:0.75em;color:#ff9800;margin-top:8px;">⚠️ Abre el portal de configuración para conectar a una nueva red</p>
         </div>
 
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
         <div class="card" style="border-left-color: #4caf50;">
             <h3>Cronómetro y Timer</h3>
             <div class="grid">
@@ -197,6 +200,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
                     list.innerHTML+=`<div class="alarm-item"><div><b>${a.hora}</b> - ${a.nombre}<br><small>${a.dias}</small></div><button class="btn-danger" style="width:40px;" onclick="del(${i})">X</button></div>`;
                 });
             });
+<<<<<<< HEAD
             fetch('/api/info').then(r=>r.text()).then(t=>{
                 document.getElementById('sysInfo').innerText=t;
                 // Extraer el nombre de la red WiFi del info (busca línea con "WiFi:")
@@ -208,6 +212,9 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
                     document.getElementById('wifiName').innerText = 'No conectado';
                 }
             });
+=======
+            fetch('/api/info').then(r=>r.text()).then(t=>document.getElementById('sysInfo').innerText=t);
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
             fetch('/api/weather_data').then(r=>r.text()).then(t=>document.getElementById('weatherData').innerText='Clima: ' + t);
         }
 
@@ -229,12 +236,15 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
         function setFace()  { cmd('/api/face?type='+document.getElementById('faceType').value+'&idx='+document.getElementById('faceIdx').value); }
         function setNeoColor(){var h=document.getElementById('neoColor').value.substring(1);cmd('/api/neocolor?hex='+h);}
         function previewTone() { cmd('/api/playTone?id=' + document.getElementById('t').value); }
+<<<<<<< HEAD
         
         function resetWiFi() {
             if(confirm('⚠️  ¿Limpiar WiFi? El portal se abrirá para conectar a una nueva red.')) {
                 fetch('/api/wifireset').then(r=>r.text()).then(t=>alert(t));
             }
         }
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
 
         window.onload = loadAlarms;
         setInterval(loadAlarms, 10000);
@@ -329,11 +339,16 @@ void apiScores() {
     server.send(200, "text/plain", res);
 }
 
+<<<<<<< HEAD
 String getWiFiNetworksList();  // Forward declaration
 
 void apiInfo() {
     String networks = getWiFiNetworksList();
     String info = "WiFi: " + WiFi.SSID() + "\nIP: " + WiFi.localIP().toString() + " | RSSI: " + String(WiFi.RSSI()) + "dBm | Uptime: " + String(millis()/60000) + "m\nRedes guardadas: " + networks;
+=======
+void apiInfo() {
+    String info = "IP: " + WiFi.localIP().toString() + " | RSSI: " + String(WiFi.RSSI()) + "dBm | Uptime: " + String(millis()/60000) + "m";
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
     server.send(200, "text/plain", info);
 }
 
@@ -424,8 +439,11 @@ void apiDeleteAlarm() {
     else server.send(404, "text/plain", "No encontrada");
 }
 
+<<<<<<< HEAD
 void apiWiFiReset();  // Forward declaration
 
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
 void setupWebServer() {
     server.on("/", HTTP_GET, handleRoot);
     server.on("/games", HTTP_GET, handleGames);
@@ -446,7 +464,10 @@ void setupWebServer() {
     server.on("/api/btnImm", apiBtnImm);
     server.on("/api/startgame", apiStartGame);
     server.on("/api/playTone", apiPlayTone);
+<<<<<<< HEAD
     server.on("/api/wifireset", apiWiFiReset);
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
     server.begin();
 }
 
@@ -476,6 +497,7 @@ void connectMQTT() {
   }
 }
 
+<<<<<<< HEAD
 // ── GESTIÓN DE MÚLTIPLES REDES WiFi ────────────────
 // Guardar una red WiFi en la lista de redes conocidas
 void saveWiFiNetwork(const char* ssid, const char* password) {
@@ -609,4 +631,6 @@ void apiWiFiReset() {
   resetWiFiCredentials();
 }
 
+=======
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
 #endif

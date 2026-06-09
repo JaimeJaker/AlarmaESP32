@@ -452,6 +452,7 @@ void weatherTask(void *pvParameters) {
   Serial.println("[CLIMA] ⏰ Intervalo de reintento: 5 minutos (WiFi desconectado)\n");
 
   while (true) {
+<<<<<<< HEAD
     // Esperar a que WiFi se conecte
     if (WiFi.status() != WL_CONNECTED) {
       Serial.println("[CLIMA] ⏳ Esperando reconexión WiFi para sincronizar...");
@@ -467,6 +468,20 @@ void weatherTask(void *pvParameters) {
     uint32_t ulNotificationValue = ulTaskNotifyTake(pdTRUE, shortDelay);
     
     if (ulNotificationValue > 0) {
+=======
+    // Actualización periódica
+    if (WiFi.status() == WL_CONNECTED) {
+      updateWeather();
+    } else {
+      Serial.println("[CLIMA] ⏳ Esperando reconexión WiFi para sincronizar...");
+    }
+
+    // Esperar notificación o timeout (10 min cuando WiFi conectado)
+    ulTaskNotifyTake(pdTRUE, shortDelay);
+
+    // Petición externa (botón, evento, etc.)
+    if (weatherFetchRequested) {
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
       weatherFetchRequested = false;
       Serial.println("[CLIMA] 🔔 Sincronización solicitada por evento externo");
       if (WiFi.status() == WL_CONNECTED) {
@@ -474,6 +489,16 @@ void weatherTask(void *pvParameters) {
       } else {
         Serial.println("[CLIMA] ❌ No se puede sincronizar: WiFi desconectado");
       }
+<<<<<<< HEAD
+=======
+      continue;
+    }
+
+    // Sin WiFi: esperar más antes del próximo intento
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("[CLIMA] 📶 Reconexión en 5 minutos...");
+      vTaskDelay(longDelay);
+>>>>>>> 4e2532c9689a2c6d08da185509392aa15581160f
     }
   }
 }
